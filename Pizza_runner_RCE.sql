@@ -19,6 +19,12 @@ SELECT runner_id, ROUND(AVG(del_time),2) AS del_avg_time FROM avg_del_time
 GROUP BY runner_id;
 
 -- 3. Is there any relationship between the number of pizzas and how long the order takes to prepare?
+SELECT c.pizza_id, ROUND(AVG(TIMESTAMPDIFF(MINUTE, c.order_time, r.pickup_time)), 2) AS avg_time_to_prepare
+FROM runner_orders_final r
+JOIN customer_orders_final c ON r.order_id = c.order_id
+WHERE r.pickup_time IS NOT NULL
+GROUP BY c.pizza_id
+ORDER BY c.pizza_id;
 
 -- 4. What was the average distance travelled for each customer?
 SELECT c.customer_id, ROUND(AVG(r.distance)) AS avg_dist FROM customer_orders_final c

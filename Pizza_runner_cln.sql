@@ -1,3 +1,4 @@
+USE pizza_runner;
 CREATE TABLE runner_orders_final AS
 SELECT 
   order_id, 
@@ -26,12 +27,12 @@ SELECT
 FROM runner_orders;
 
 CREATE TABLE customer_orders_final AS
-SELECT order_id, 
-       customer_id,
-       pizza_id, 
-       CASE WHEN exclusions = '' or exclusions like 'null' or exclusions like 'NaN' THEN NULL
-            ELSE exclusions END AS exclusions,
-       CASE WHEN extras = '' OR extras like 'null' or extras like 'NaN' THEN NULL
-            ELSE extras END AS extras, 
-       order_time
-FROM customer_orders;
+select order_id, customer_id, pizza_id, order_time,
+case when exclusions = '' then null
+when exclusions = 'null' then null
+else exclusions end as exclusions_cleaned,
+case when extras = '' then null
+when extras = 'null' then null
+else extras end as extras_cleaned
+from customer_orders;
+       

@@ -44,9 +44,9 @@ WHERE pizza_id = 1 AND extras = 1
 GROUP BY order_id;
 
       -- Meat Lovers - Exclude Cheese, Bacon - Extra Mushroom, Peppers
-WITH CTE AS (SELECT order_id, CASE WHEN
-						  exclusions IN (1,4) THEN 1 
-					  WHEN extras IN (6,9) THEN 1 END AS ee_count
+WITH CTE AS (SELECT order_id,
+CASE WHEN exclusions IN (1,4) THEN 1 
+     WHEN extras IN (6,9) THEN 1 END AS ee_count
 FROM customer_orders_final
 WHERE pizza_id = 1)
 SELECT DISTINCT order_id, ee_count FROM CTE

@@ -11,10 +11,10 @@ SELECT WEEK(registration_date) AS weekno, COUNT(runner_id) AS reg_runner FROM ru
 GROUP BY WEEK(registration_date);
 
 -- 2. What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?
-WITH avg_del_time AS 
-                    (SELECT r.runner_id, TIMESTAMPDIFF(MINUTE,c.order_time,r.pickup_time) AS del_time FROM customer_orders_final c
-					 JOIN runner_orders_final r ON c.order_id = r.order_id
-					 WHERE r.distance != 0 and n_cancellation is null)
+WITH avg_del_time AS (SELECT r.runner_id, TIMESTAMPDIFF(MINUTE,c.order_time,r.pickup_time) AS del_time
+FROM customer_orders_final c
+JOIN runner_orders_final r ON c.order_id = r.order_id
+WHERE r.distance != 0 and n_cancellation is null)
 SELECT runner_id, ROUND(AVG(del_time),2) AS del_avg_time FROM avg_del_time
 GROUP BY runner_id;
 

@@ -8,27 +8,26 @@ SELECT * FROM pizza_toppings;
 SELECT * FROM runners;
 
 -- 1. If a Meat Lovers pizza costs $12 and Vegetarian costs $10 and there were no charges for changes - how much money has Pizza Runner made so far if there are no delivery fees?
-SELECT runner_id, SUM(pizza_cost) AS total_cost FROM 
-	   (SELECT r.runner_id, CASE
-						        WHEN c.pizza_id = 1 THEN 12
-						        WHEN c.pizza_id = 2 THEN 10 END AS pizza_cost
+SELECT  SUM(pizza_cost) AS total_cost
+FROM (SELECT r.runner_id,
+      CASE WHEN c.pizza_id = 1 THEN 12
+		   WHEN c.pizza_id = 2 THEN 10 END AS pizza_cost
        FROM customer_orders_final c
        JOIN runner_orders_final r ON c.order_id = r.order_id
        WHERE r.n_cancellation IS NULL) AS pizza_cost_per_run
-GROUP BY runner_id;
+
 
 -- 2. What if there was an additional $1 charge for any pizza extras?
       -- Add cheese is $1 extra
-SELECT runner_id, SUM(total_cost) AS total_cost
-       FROM ( SELECT r.runner_id, CASE
-                                      WHEN c.pizza_id = 1 THEN 12 
-									  WHEN c.pizza_id = 2 THEN 10 END + 
-						          CASE
-							          WHEN c.extras LIKE '%4%' THEN 1 ELSE 0 END AS total_cost
+SELECT SUM(total_cost) AS total_cost
+FROM (SELECT r.runner_id,
+      CASE WHEN c.pizza_id = 1 THEN 12 
+	       WHEN c.pizza_id = 2 THEN 10 END + 
+      CASE WHEN c.extras LIKE '%4%' THEN 1 ELSE 0 END +
+      CASE WHEN c.extras IS NOT NULL  THEN 1 ELSE 0 END AS total_cost
 FROM customer_orders_final c
 JOIN runner_orders_final r ON c.order_id = r.order_id
-WHERE r.n_cancellation IS NULL) AS cost_per_run
-GROUP BY runner_id;
+WHERE r.n_cancellation IS NULL) AS cost_per_run;
 
 -- 3. The Pizza Runner team now wants to add an additional ratings system that allows customers to rate their runner, how would you design an additional table for this new dataset
       -- generate a schema for this new table and insert your own data for ratings for each successful customer order between 1 to 5.
@@ -59,17 +58,14 @@ ORDER BY c.customer_id
 
 -- 5. If a Meat Lovers pizza was $12 and Vegetarian $10 fixed prices with no cost for extras and each runner is paid $0.30 per kilometre traveled - 
    -- how much money does Pizza Runner have left over after these deliveries?
-SELECT SUM(pizza_cost) AS total_revenue,
+SELECT runner_id,
+       SUM(pizza_cost) AS total_revenue,
        SUM(distance) * 0.3 AS total_spend,
-       SUM(pizza_cost) - SUM(distance) * 0.3
+       SUM(pizza_cost) - SUM(distance) * 0.3 AS profit
 FROM (SELECT r.runner_id, r.distance,
-       CASE
-			WHEN c.pizza_id = 1 THEN 12
-			WHEN c.pizza_id = 2 THEN 10 END AS pizza_cost
+	  CASE WHEN c.pizza_id = 1 THEN 12
+		   WHEN c.pizza_id = 2 THEN 10 END AS pizza_cost
        FROM customer_orders_final c
        JOIN runner_orders_final r ON c.order_id = r.order_id
        WHERE r.n_cancellation IS NULL) AS pizza_cost_per_run
 GROUP BY runner_id;
-   
-   
-   
